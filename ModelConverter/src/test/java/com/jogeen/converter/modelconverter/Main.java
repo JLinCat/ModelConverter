@@ -14,7 +14,6 @@ import com.jogeen.converter.modelconverter.handle.java.JavaModelHandler;
 import com.jogeen.converter.modelconverter.model.TableModel;
 import com.jogeen.converter.modelconverter.model.Column;
 import com.jogeen.converter.modelconverter.model.OutputModel;
-import com.jogeen.converter.modelconverter.model.PersistentModel;
 import com.jogeen.converter.modelconverter.persistent.IPersistent;
 import com.jogeen.converter.modelconverter.persistent.impl.JavaFilePersistent;
 

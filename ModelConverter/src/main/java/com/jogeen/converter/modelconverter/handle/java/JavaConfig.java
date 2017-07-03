@@ -22,6 +22,8 @@ public class JavaConfig {
 	private Boolean isUserPackingType;
 	
 	
+	public JavaConfig() {
+	}
 
 	public JavaConfig(String nameSpace) {
 		super();

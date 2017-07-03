@@ -17,6 +17,12 @@ import com.jogeen.converter.modelconverter.model.DataBaseModel;
 import com.jogeen.converter.modelconverter.model.TableModel;
 import com.jogeen.converter.modelconverter.util.StringUtil;
 
+/**
+ * @version 1.0
+ * @author jogeen
+ * mysql的数据提取器
+ *
+ */
 public class MysqlDataExtractor implements IDataExtractor {
 	Logger logger = Logger.getLogger(MysqlDataExtractor.class);
 
@@ -139,16 +145,17 @@ public class MysqlDataExtractor implements IDataExtractor {
 		return list;
 	}
 
-	public Connection buildEmptyConnection() {
+	public Connection TestConnect() {
 		try {
 			Class.forName(dataConnectConfig.getDriver());
 			String dbURL = getURL();
+			logger.info("init db url:"+dbURL);
 			connection = DriverManager.getConnection(dbURL, dataConnectConfig.getUser(),
 					dataConnectConfig.getPassword());
-			System.out.println("Connection Successful!");
+			logger.info("Connection Successful!");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Connection failed!");
+			logger.error("Connection failed!");
 			return null;
 		}
 		return connection;
@@ -166,12 +173,24 @@ public class MysqlDataExtractor implements IDataExtractor {
 	}
 
 	public DataBaseModel getDataBaseModel(String dataBaseName) {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> tableNames = getTableNames(dataBaseName);
+		List<TableModel> tableList = new ArrayList<TableModel>();
+		for (String tableName : tableNames) {
+			List<Column> columns = getColumns(dataBaseName, tableName);
+			TableModel tableModel=new TableModel();
+			tableModel.setColumns(columns);
+			tableModel.setTableName(tableName);
+			tableList.add(tableModel);
+		}
+		DataBaseModel dataBaseModel = new DataBaseModel(dataBaseName,tableList);
+		return dataBaseModel;
 	}
 
-	public TableModel getTableModel(String tableName) {
-		// TODO Auto-generated method stub
-		return null;
+	public TableModel getTableModel(String dataBaseName,String tableName) {
+		List<Column> columns = getColumns(dataBaseName, tableName);
+		TableModel tableModel=new TableModel();
+		tableModel.setColumns(columns);
+		tableModel.setTableName(tableName);
+		return tableModel;
 	}
 }

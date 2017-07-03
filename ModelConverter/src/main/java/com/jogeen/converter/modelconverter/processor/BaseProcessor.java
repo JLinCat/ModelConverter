@@ -14,7 +14,7 @@ import com.jogeen.converter.modelconverter.model.OutputModel;
 import com.jogeen.converter.modelconverter.persistent.IPersistent;
 import com.jogeen.converter.modelconverter.persistent.impl.JavaFilePersistent;
 
-public class SimpleProcessor {
+public class BaseProcessor implements IConverterProcessor{
 	/**
 	 * 主机地址
 	 */
@@ -53,9 +53,8 @@ public class SimpleProcessor {
 
 	
 	
-	public SimpleProcessor(String host, Integer port, String user, String password, String dataBaseName,
+	public BaseProcessor(String host, Integer port, String user, String password, String dataBaseName,
 			String nameSpace, Boolean isUseTableName, String dirName) {
-		super();
 		this.host = host;
 		this.port = port;
 		this.user = user;
@@ -81,7 +80,8 @@ public class SimpleProcessor {
 		
 	}
 	
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) throws Exception {
+		BaseProcessor simpleProcessor = new BaseProcessor("localhost", 3306, "root", "root", "plan_manage","com.jogeen", true, "D:/MC");
+		simpleProcessor.execute();
 	}
 }

@@ -17,7 +17,8 @@ public class DataBaseModel {
 	private List<TableModel> list;
 	
 	
-	
+	public DataBaseModel() {
+	}
 	public DataBaseModel(String dataBaseName, List<TableModel> list) {
 		super();
 		this.dataBaseName = dataBaseName;

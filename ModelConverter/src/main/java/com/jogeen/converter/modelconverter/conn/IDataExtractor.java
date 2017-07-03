@@ -11,7 +11,7 @@ public interface IDataExtractor {
 	/**
 	 * @return 返回数据库连接
 	 */
-	public Connection buildEmptyConnection();
+	public Connection TestConnect();
 	
 	/**
 	 * 获取所有库名
@@ -47,6 +47,6 @@ public interface IDataExtractor {
 	 * 
 	 * @return
 	 */
-	public TableModel getTableModel(String tableName);
+	public TableModel getTableModel(String dataBaseName,String tableName);
 	
 }
