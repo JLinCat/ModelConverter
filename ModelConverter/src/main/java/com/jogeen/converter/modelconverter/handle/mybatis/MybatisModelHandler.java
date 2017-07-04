@@ -1,8 +1,9 @@
-package com.jogeen.converter.modelconverter.handle;
+package com.jogeen.converter.modelconverter.handle.mybatis;
 
 import java.util.List;
 
 import com.jogeen.converter.modelconverter.exception.HandlerException;
+import com.jogeen.converter.modelconverter.handle.IModelHandler;
 import com.jogeen.converter.modelconverter.model.DataBaseModel;
 import com.jogeen.converter.modelconverter.model.OutputModel;
 import com.jogeen.converter.modelconverter.model.TableModel;
