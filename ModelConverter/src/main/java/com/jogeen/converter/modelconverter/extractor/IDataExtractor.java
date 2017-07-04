@@ -1,4 +1,4 @@
-package com.jogeen.converter.modelconverter.conn;
+package com.jogeen.converter.modelconverter.extractor;
 
 import java.sql.Connection;
 import java.util.List;

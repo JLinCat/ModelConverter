@@ -1,4 +1,4 @@
-package com.jogeen.converter.modelconverter.persistent.impl;
+package com.jogeen.converter.modelconverter.persistent.impl.file;
 
 import java.io.File;
 import java.util.List;

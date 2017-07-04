@@ -11,3 +11,4 @@ public interface IPersistent {
 	 */
 	public void persistent(List<OutputModel> list)throws Exception;
 }
+ 

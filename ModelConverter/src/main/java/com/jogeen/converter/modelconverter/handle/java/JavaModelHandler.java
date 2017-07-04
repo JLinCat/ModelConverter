@@ -19,22 +19,21 @@ public class JavaModelHandler implements IModelHandler {
 	protected static final String NEW_LINE_T = "\r\n\t";
 	protected static final String NEW_LINE = "\r\n";
 	protected static final String TAB = "    ";
-	
+
 	/**
 	 * 字段类型转换接口
 	 */
 	protected IFieldType fieldType;
-	
-	/**
-	 * java配置信息
-	 */
-	protected JavaConfig javaConfig;
 
-	
-	public JavaModelHandler(IFieldType fieldType,JavaConfig javaConfig) {
+	/**
+	 * 类信息接口
+	 */
+	protected IClassInfo classInfo;
+
+	public JavaModelHandler(IFieldType fieldType,IClassInfo classInfo) {
 		super();
 		this.fieldType = fieldType;
-		this.javaConfig = javaConfig;
+		this.classInfo = classInfo;
 	}
 
 	public List<OutputModel> dealModel(DataBaseModel dataBaseModel)
@@ -43,6 +42,8 @@ public class JavaModelHandler implements IModelHandler {
 		List<TableModel> list = dataBaseModel.getList();
 		for (TableModel classModel : list) {
 			OutputModel outputModel = dealModel(classModel);
+			outputModel.setClassName(classInfo.getClassName(classModel.getTableName()));
+			outputModel.setNameSpace(classInfo.getSpaceName(classModel.getTableName()));
 			result.add(outputModel);
 		}
 		return result;
@@ -50,11 +51,9 @@ public class JavaModelHandler implements IModelHandler {
 
 	public OutputModel dealModel(TableModel classModel) throws HandlerException {
 		transType(classModel);
-		String nameSpace = javaConfig.getNameSpace();
-		// 是否使用数据库表名当作类名
-		String className = javaConfig.getIsUseTableName() ? classModel
-				.getTableName() : javaConfig.getClassName();
-		if(StringUtil.isEmpty(className)){
+		String nameSpace = classInfo.getSpaceName(classModel.getTableName());
+		String className = classInfo.getClassName(classModel.getTableName());
+		if (StringUtil.isEmpty(className)) {
 			throw new HandlerException("表名不能未空");
 		}
 		OutputModel outputModel = new OutputModel(nameSpace, className);
@@ -64,11 +63,11 @@ public class JavaModelHandler implements IModelHandler {
 		classBuffer.append("package ").append(nameSpace).append(";").append(NEW_LINE);
 		StringBuffer importBuffer = new StringBuffer();
 		Set<String> set = new HashSet<String>();
-		StringBuffer contentBuffer=new StringBuffer();
+		StringBuffer contentBuffer = new StringBuffer();
 		contentBuffer.append("public class ").append(className).append("{").append(NEW_LINE_T);
 		// 加入属性
 		buildFields(columns, contentBuffer, set);
-		//加Get、Set方法
+		// 加Get、Set方法
 		buildSetGet(columns, contentBuffer);
 		contentBuffer.append(NEW_LINE).append("}");
 		// 加入 类的导入信息
@@ -81,6 +80,7 @@ public class JavaModelHandler implements IModelHandler {
 
 	/**
 	 * 构建java的get和设方法
+	 * 
 	 * @param columns
 	 * @param classBuffer
 	 */
@@ -88,7 +88,7 @@ public class JavaModelHandler implements IModelHandler {
 		for (Column column : columns) {
 			String comment = column.getComment();
 			String field = column.getField();
-			String buildDocument = buildDocument(StringUtil.isEmpty(comment) ? field: comment);
+			String buildDocument = buildDocument(StringUtil.isEmpty(comment) ? field : comment);
 			// get方法
 			classBuffer.append(buildDocument).append(NEW_LINE_T);
 			classBuffer.append(buildGet(column));
@@ -100,35 +100,33 @@ public class JavaModelHandler implements IModelHandler {
 
 	/**
 	 * 构建java的get方法字段
+	 * 
 	 * @param column
 	 * @return
 	 */
 	private StringBuffer buildGet(Column column) {
-		StringBuffer getBuffer=new StringBuffer();
-		getBuffer.append("public {TYPE} get{FIELD}(){").append(NEW_LINE_T)
-		.append(TAB).append("return this.{field}").append(";").append(NEW_LINE_T)
-		.append("}").append(NEW_LINE_T);
-		String method = getBuffer.toString()
-		.replaceAll("\\{TYPE\\}", StringUtil.getShortTypeName(column.getType()))
-		.replaceAll("\\{FIELD\\}", StringUtil.firstToUppper(column.getField()))
-		.replaceAll("\\{field\\}", StringUtil.firstTolower(column.getField()));
+		StringBuffer getBuffer = new StringBuffer();
+		getBuffer.append("public {TYPE} get{FIELD}(){").append(NEW_LINE_T).append(TAB).append("return this.{field}")
+				.append(";").append(NEW_LINE_T).append("}").append(NEW_LINE_T);
+		String method = getBuffer.toString().replaceAll("\\{TYPE\\}", StringUtil.getShortTypeName(column.getType()))
+				.replaceAll("\\{FIELD\\}", StringUtil.firstToUppper(column.getField()))
+				.replaceAll("\\{field\\}", StringUtil.firstTolower(column.getField()));
 		return new StringBuffer(method);
 	}
 
 	/**
 	 * 构建java的set
+	 * 
 	 * @param column
 	 * @return
 	 */
 	private StringBuffer buildSet(Column column) {
-		StringBuffer setBuffer=new StringBuffer();
-		setBuffer.append("public void set{FIELD}({TYPE} {field}){").append(NEW_LINE_T)
-		.append(TAB).append("this.{field}={field};").append(NEW_LINE_T)
-		.append("}").append(NEW_LINE_T);
-		String method = setBuffer.toString()
-		.replaceAll("\\{TYPE\\}", StringUtil.getShortTypeName(column.getType()))
-		.replaceAll("\\{FIELD\\}", StringUtil.firstToUppper(column.getField()))
-		.replaceAll("\\{field\\}", StringUtil.firstTolower(column.getField()));
+		StringBuffer setBuffer = new StringBuffer();
+		setBuffer.append("public void set{FIELD}({TYPE} {field}){").append(NEW_LINE_T).append(TAB)
+				.append("this.{field}={field};").append(NEW_LINE_T).append("}").append(NEW_LINE_T);
+		String method = setBuffer.toString().replaceAll("\\{TYPE\\}", StringUtil.getShortTypeName(column.getType()))
+				.replaceAll("\\{FIELD\\}", StringUtil.firstToUppper(column.getField()))
+				.replaceAll("\\{field\\}", StringUtil.firstTolower(column.getField()));
 		return new StringBuffer(method);
 	}
 
@@ -138,17 +136,14 @@ public class JavaModelHandler implements IModelHandler {
 	 * @param classBuffer
 	 * @param set
 	 */
-	private void buildFields(List<Column> columns, StringBuffer classBuffer,
-			Set<String> set) {
+	private void buildFields(List<Column> columns, StringBuffer classBuffer, Set<String> set) {
 		for (Column column : columns) {
 			String comment = column.getComment();
 			String field = column.getField();
-			String buildDocument = buildDocument(StringUtil.isEmpty(comment) ? field
-					: comment);
+			String buildDocument = buildDocument(StringUtil.isEmpty(comment) ? field : comment);
 			classBuffer.append(buildDocument).append(NEW_LINE_T);
-			classBuffer.append("private ")
-					.append(StringUtil.getShortTypeName(column.getType()))
-					.append(" ").append(StringUtil.firstTolower(field)).append(";").append(NEW_LINE_T);
+			classBuffer.append("private ").append(StringUtil.getShortTypeName(column.getType())).append(" ")
+					.append(StringUtil.firstTolower(field)).append(";").append(NEW_LINE_T);
 			if (!set.contains(column.getType())) {
 				set.add(column.getType());
 			}
@@ -160,11 +155,11 @@ public class JavaModelHandler implements IModelHandler {
 	 * @return
 	 */
 	private String buildDocument(String document) {
-		String arttributeNote = "/**"+NEW_LINE_T+"* DOCUMENT."+NEW_LINE_T+"*/";
+		String arttributeNote = "/**" + NEW_LINE_T + "* DOCUMENT." + NEW_LINE_T + "*/";
 		return arttributeNote.replaceFirst("DOCUMENT", document);
 	}
-	
-	private void transType(TableModel classModel){
+
+	private void transType(TableModel classModel) {
 		List<Column> columns = classModel.getColumns();
 		for (Column column : columns) {
 			column.setType(fieldType.getReallyType(column.getType()));

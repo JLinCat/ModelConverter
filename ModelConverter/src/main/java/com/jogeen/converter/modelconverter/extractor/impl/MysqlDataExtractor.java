@@ -1,4 +1,4 @@
-package com.jogeen.converter.modelconverter.conn.impl;
+package com.jogeen.converter.modelconverter.extractor.impl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.jogeen.converter.modelconverter.conn.DataConnectConfig;
-import com.jogeen.converter.modelconverter.conn.IDataExtractor;
+import com.jogeen.converter.modelconverter.extractor.IDataExtractor;
 import com.jogeen.converter.modelconverter.model.Column;
 import com.jogeen.converter.modelconverter.model.DataBaseModel;
 import com.jogeen.converter.modelconverter.model.TableModel;
